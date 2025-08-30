@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>EZ Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* ...CSS tetap seperti sebelumnya... */
+        body {
+            background: linear-gradient(120deg, #f7971e 0%, #ffd200 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #2d2d2d;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 540px;
+            margin: 48px auto;
+            background: linear-gradient(135deg, #fff6e0 0%, #f8ffae 100%);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(67,198,172,0.18);
+            padding: 36px 28px;
+            position: relative;
+            z-index: 2;
+            animation: fadeIn 1s;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(40px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        h1 {
+            text-align: center;
+            color: #f7971e;
+            margin-bottom: 18px;
+            font-size: 2.3em;
+            letter-spacing: 2px;
+            animation: pop 0.7s;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8);}
+            80% { transform: scale(1.1);}
+            100% { transform: scale(1);}
+        }
+        .info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 26px;
+            font-size: 1.15em;
+        }
+        .question {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.13em;
+            color: #f7971e;
+            animation: fadeIn 0.7s;
+        }
+        .options label {
+            display: block;
+            background: #fff6e0;
+            margin: 10px 0;
+            padding: 12px 18px;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            border: 1px solid #ffd200;
+            font-size: 1em;
+            box-shadow: 0 2px 8px rgba(247,151,30,0.07);
+        }
+        .options input[type="radio"] {
+            margin-right: 12px;
+        }
+        .options label:hover, .options input[type="radio"]:checked + label {
+            background: #ffd200;
+            color: #fff;
+            transform: scale(1.04);
+            box-shadow: 0 0 18px #ffd20055;
+        }
+        button {
+            background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
+            color: white;
+            border: none;
+            padding: 14px 26px;
+            border-radius: 9px;
+            font-size: 1.07em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s, transform 0.2s;
+            width: 100%;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 12px rgba(247,151,30,0.08);
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        button:disabled {
+            background: #ffe4b5;
+            cursor: not-allowed;
+        }
+        .score {
+            text-align: center;
+            font-size: 1.8em;
+            color: #fff;
+            margin-top: 28px;
+            animation: pop 0.7s;
+            font-weight: bold;
+            background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 2px 12px rgba(247,151,30,0.12);
+        }
+        .timer {
+            color: #f7971e;
+            font-weight: bold;
+        }
+        #particles {
+            position: fixed;
+            left: 0; top: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .slide-anim {
+            animation: slideIn 0.5s;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(60px);}
+            to { opacity: 1; transform: translateX(0);}
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ffe4b5;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
+            border-radius: 6px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    <div class="container" id="quiz-container">
+        <h1>EZ Quiz</h1>
+        <div class="progress-bar"><div class="progress" id="progress"></div></div>
+        <div class="info">
+            <span id="slide">Soal 1</span>
+            <span class="timer" id="timer">Waktu: 120</span>
+        </div>
+        <div id="question-area"></div>
+        <button id="next-btn" disabled>Lanjut</button>
+        <div id="score-area"></div>
+    </div>
+    <script>
+        // 20 soal umum
+        const questions = [
+            {question:"Ibukota Indonesia adalah?",options:["Jakarta","Bandung","Surabaya","Medan"],answer:0},
+            {question:"Planet terbesar di tata surya?",options:["Jupiter","Saturnus","Bumi","Mars"],answer:0},
+            {question:"Siapa presiden pertama Indonesia?",options:["Soekarno","Soeharto","Jokowi","BJ Habibie"],answer:0},
+            {question:"Hasil dari 12 x 11?",options:["132","121","143","124"],answer:0},
+            {question:"Gunung tertinggi di dunia?",options:["Everest","Kilimanjaro","Elbrus","Aconcagua"],answer:0},
+            {question:"Benda cair yang dibutuhkan manusia setiap hari?",options:["Air","Minyak","Bensin","Sirup"],answer:0},
+            {question:"Lambang unsur kimia Oksigen?",options:["O","Ox","Og","Oz"],answer:0},
+            {question:"Negara dengan populasi terbanyak?",options:["Cina","India","Amerika","Indonesia"],answer:0},
+            {question:"Penemu bola lampu?",options:["Thomas Edison","Nikola Tesla","Alexander Graham Bell","Isaac Newton"],answer:0},
+            {question:"Hewan tercepat di darat?",options:["Cheetah","Kuda","Singa","Harimau"],answer:0},
+            {question:"Ibukota Jepang?",options:["Tokyo","Osaka","Kyoto","Nagoya"],answer:0},
+            {question:"Benua terbesar di dunia?",options:["Asia","Afrika","Amerika","Eropa"],answer:0},
+            {question:"Alat musik tradisional Indonesia dari Jawa Barat?",options:["Angklung","Gamelan","Sasando","Tifa"],answer:0},
+            {question:"Satuan SI untuk arus listrik?",options:["Ampere","Volt","Ohm","Watt"],answer:0},
+            {question:"Organ yang memompa darah?",options:["Jantung","Paru-paru","Ginjal","Liver"],answer:0},
+            {question:"Benda langit yang mengelilingi bumi?",options:["Bulan","Matahari","Mars","Venus"],answer:0},
+            {question:"Penulis novel 'Harry Potter'?",options:["J.K. Rowling","Stephen King","Agatha Christie","Dan Brown"],answer:0},
+            {question:"Hasil dari 100 dibagi 4?",options:["25","20","24","40"],answer:0},
+            {question:"Bahasa pemrograman yang dibuat oleh Guido van Rossum?",options:["Python","Java","C++","Ruby"],answer:0},
+            {question:"Ibukota Australia?",options:["Canberra","Sydney","Melbourne","Perth"],answer:0}
+        ];
+
+        // Shuffle questions, pick 20 random
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        const quizQuestions = shuffle(questions.slice()).slice(0, 20);
+
+        let current = 0, score = 0, selected = null, time = 120, timerInterval;
+        let answered = Array(quizQuestions.length).fill(false);
+
+        function showQuestion() {
+            if (current >= quizQuestions.length) return;
+            document.getElementById('slide').textContent = `Soal ${current+1} / ${quizQuestions.length}`;
+            document.getElementById('progress').style.width = ((current+1)/quizQuestions.length*100)+"%";
+            const q = quizQuestions[current];
+            let html = `<div class="question slide-anim">${q.question}</div><div class="options">`;
+            q.options.forEach((opt, i) => {
+                html += `<input type="radio" id="opt${i}" name="opt" value="${i}" style="display:none;">
+                         <label for="opt${i}">${opt}</label>`;
+            });
+            html += `</div>`;
+            document.getElementById('question-area').innerHTML = html;
+            document.getElementById('next-btn').disabled = true;
+            selected = null;
+            document.querySelectorAll('input[name="opt"]').forEach(input => {
+                input.onchange = function() {
+                    selected = parseInt(this.value);
+                    document.getElementById('next-btn').disabled = false;
+                    document.querySelectorAll('.options label').forEach(l=>l.style.boxShadow="");
+                    document.querySelector(`label[for="opt${selected}"]`).style.boxShadow = "0 0 24px #f7971e88";
+                }
+            });
+        }
+
+        function showScore() {
+            document.getElementById('question-area').innerHTML = '';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('score-area').innerHTML = `<div class="score">Skor kamu: ${score} / ${quizQuestions.length}</div>`;
+            clearInterval(timerInterval);
+            document.getElementById('slide').textContent = "Selesai";
+            document.getElementById('progress').style.width = "100%";
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            if (!answered[current] && selected !== null) {
+                if (selected === quizQuestions[current].answer) score++;
+                answered[current] = true;
+            }
+            current++;
+            if (current < quizQuestions.length) {
+                showQuestion();
+            } else {
+                showScore();
+            }
+        };
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                time--;
+                document.getElementById('timer').textContent = `Waktu: ${time}`;
+                if (time <= 0) {
+                    showScore();
+                }
+            }, 1000);
+        }
+
+        showQuestion();
+        startTimer();
+
+        // Partikel animasi lebih banyak dan warna lebih variatif
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let w = window.innerWidth, h = window.innerHeight;
+        canvas.width = w; canvas.height = h;
+        window.onresize = () => {
+            w = window.innerWidth; h = window.innerHeight;
+            canvas.width = w; canvas.height = h;
+        };
+        const colors = [
+            "rgba(247,151,30,0.7)",
+            "rgba(255,182,193,0.7)",
+            "rgba(255,192,203,0.7)",
+            "rgba(255,210,0,0.7)",
+            "rgba(255,255,255,0.7)",
+            "rgba(255,105,180,0.7)",
+            "rgba(255,20,147,0.7)"
+        ];
+        const particles = [];
+        for(let i=0;i<120;i++){
+            particles.push({
+                x: Math.random()*w,
+                y: Math.random()*h,
+                r: Math.random()*7+2,
+                dx: (Math.random()-0.5)*2.2,
+                dy: (Math.random()-0.5)*2.2,
+                color: colors[Math.floor(Math.random()*colors.length)]
+            });
+        }
+        function drawParticles(){
+            ctx.clearRect(0,0,w,h);
+            for(let p of particles){
+                ctx.beginPath();
+                ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
+                ctx.fillStyle = p.color;
+                ctx.shadowColor = "#ffd200";
+                ctx.shadowBlur = 16;
+                ctx.fill();
+                p.x += p.dx;
+                p.y += p.dy;
+                if(p.x<0||p.x>w) p.dx*=-1;
+                if(p.y<0||p.y>h) p.dy*=-1;
+            }
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+    </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+/* Tumbal.css - Elegant, modern style for adults */
+
+body {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    background: linear-gradient(120deg, #ece9e6 0%, #ffffff 100%);
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: #2d3748;
+    color: #fff;
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+}
+
+main {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+    padding: 2rem;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+p {
+    line-height: 1.7;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+a {
+    color: #3182ce;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+a:hover {
+    color: #2b6cb0;
+    text-decoration: underline;
+}
+
+button, .btn {
+    background: #3182ce;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+button:hover, .btn:hover {
+    background: #2b6cb0;
+}
+
+input, textarea, select {
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+footer {
+    text-align: center;
+    padding: 1.5rem 0;
+    color: #888;
+    font-size: 1rem;
+    background: #f7fafc;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 2rem;
+}
